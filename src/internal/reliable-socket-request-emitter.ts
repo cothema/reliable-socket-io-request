@@ -17,9 +17,8 @@ export class ReliableSocketRequestEmitter {
     };
     private emitRequestCounter = 0;
 
-    public constructor(private socket: ISocketEmitter) {}
-
     public emit(
+        socket: ISocketEmitter,
         eventName: string,
         emitDataPack: any,
         optionsIn: Partial<IReliableSocketEmitOptions> = this
@@ -36,13 +35,14 @@ export class ReliableSocketRequestEmitter {
             id: this.emitRequestCounter++,
             isCompleted: false,
             options,
+            socket,
         } as IReliableSocketRequest;
 
         this.emitQueues[options.queueName].push(socketRequest);
 
         emitDataPack.requestCounter = this.emitRequestCounter;
 
-        return this.createEmitPromise(socketRequest, options);
+        return this.createEmitPromise(socket, socketRequest, options);
     }
 
     private removeFromEmitQueue(socketRequest: IReliableSocketRequest) {
@@ -55,18 +55,19 @@ export class ReliableSocketRequestEmitter {
     }
 
     private createEmitPromise(
+        socket: ISocketEmitter,
         socketRequest: IReliableSocketRequest,
         options: IReliableSocketEmitOptions,
     ): Promise<any> {
         return new Promise(resolve => {
             socketRequest.isCompleted = false;
 
-            this.emitRequest(socketRequest, response => {
+            this.emitRequest(socket, socketRequest, response => {
                 resolve(response);
             });
 
             socketRequest.interval = setInterval(() => {
-                this.emitRequest(socketRequest, response => {
+                this.emitRequest(socket, socketRequest, response => {
                     resolve(response);
                 });
             }, options.retryTime);
@@ -77,6 +78,7 @@ export class ReliableSocketRequestEmitter {
      * Emit the request in a package and mark as completed if success
      */
     private emitRequest(
+        socket: ISocketEmitter,
         socketRequest: IReliableSocketRequest,
         callback: (response: any) => void,
     ): void {
@@ -87,20 +89,24 @@ export class ReliableSocketRequestEmitter {
             return;
         }
 
-        this.socket.emit(
-            socketRequest.eventName,
-            this.createEmitPack(socketRequest, socketRequest.options),
-            (response: any) => {
-                socketRequest.isCompleted = true;
-                this.removeFromEmitQueue(socketRequest);
+        if (socket) {
+            socket.emit(
+                socketRequest.eventName,
+                this.createEmitPack(socketRequest, socketRequest.options),
+                (response: any) => {
+                    socketRequest.isCompleted = true;
+                    this.removeFromEmitQueue(socketRequest);
 
-                if (socketRequest.interval) {
-                    clearInterval(socketRequest.interval);
-                }
+                    if (socketRequest.interval) {
+                        clearInterval(socketRequest.interval);
+                    }
 
-                callback(response);
-            },
-        );
+                    callback(response);
+                },
+            );
+        } else {
+            throw Error("No provided socket!");
+        }
     }
 
     /**

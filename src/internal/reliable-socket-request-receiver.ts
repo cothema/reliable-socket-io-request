@@ -7,16 +7,22 @@ export class ReliableSocketRequestReceiver {
         default: [],
     };
 
-    public constructor(private socket: ISocketEmitter) {}
-
-    public on(eventName: string, callback: (response: any) => void) {
-        this.socket.on(eventName, (response: IReliableSocketRequestPack) => {
+    public on(
+        socket: ISocketEmitter,
+        eventName: string,
+        callback: (response: any) => void,
+    ) {
+        socket.on(eventName, (response: IReliableSocketRequestPack) => {
             callback(response.body);
         });
     }
 
-    public once(eventName: string, callback: (response: any) => void) {
-        this.socket.once(eventName, (response: IReliableSocketRequestPack) => {
+    public once(
+        socket: ISocketEmitter,
+        eventName: string,
+        callback: (response: any) => void,
+    ) {
+        socket.once(eventName, (response: IReliableSocketRequestPack) => {
             callback(response.body);
         });
     }

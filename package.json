@@ -22,9 +22,13 @@
     },
     "prepublish": "npm run lint && npm run build",
     "peerDependencies": {
-        "rxjs": "^6.5.4"
+        "rxjs": "^6.5.4",
+        "rxjs-compat": "^6.5.4"
     },
-    "optionalDependencies": {},
+    "optionalDependencies": {
+        "@angular/core": "^8.2.14",
+        "ng-socket-io": "^0.2.4"
+    },
     "devDependencies": {
         "@angular-devkit/build-ng-packagr": "^0.803.22",
         "@angular/cli": "^8.3.22",
@@ -36,9 +40,6 @@
         "@babel/plugin-proposal-decorators": "^7.8.0",
         "@pika/cli": "^0.2.0",
         "@pika/pack": "^0.5.0",
-        "@pika/plugin-build-node": "^0.8.1",
-        "@pika/plugin-build-types": "^0.8.1",
-        "@pika/plugin-ts-standard-pkg": "^0.8.1",
         "@types/jasmine": "^3.5.0",
         "@types/node": "^13.1.6",
         "husky": "^4.0.7",
@@ -47,6 +48,7 @@
         "ng-packagr": "^5.7.1",
         "prettier": "^1.19.1",
         "rxjs": "^6.5.4",
+        "rxjs-compat": "^6.5.4",
         "tslint": "^5.20.1",
         "tslint-config-prettier": "^1.18.0",
         "tslint-etc": "^1.10.0",
