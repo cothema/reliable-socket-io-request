@@ -1,16 +1,16 @@
 import { IReliableSocketEmitOptions } from "../interfaces/i-reliable-socket-emit-options";
+import { ISocketEmitter } from "../interfaces/i-socket-emitter";
 import { ReliableSocketRequestEmitter } from "../internal/reliable-socket-request-emitter";
 import { ReliableSocketRequestReceiver } from "../internal/reliable-socket-request-receiver";
-import { SocketProvider } from "../providers/socket-provider";
 
 /**
- * Mostly for client side
+ * Mostly for server side
  */
 export class ReliableSocketRequestService {
     private emitter: ReliableSocketRequestEmitter;
     private receiver: ReliableSocketRequestReceiver;
 
-    public constructor(private socketProvider: SocketProvider) {
+    public constructor() {
         this.emitter = new ReliableSocketRequestEmitter();
         this.receiver = new ReliableSocketRequestReceiver();
     }
@@ -23,35 +23,23 @@ export class ReliableSocketRequestService {
      * @param options
      */
     public emit(
+        socket: ISocketEmitter,
         eventName: string,
         emitDataPack: any,
         options: Partial<IReliableSocketEmitOptions> = {},
     ): Promise<any> {
-        if (this.socketProvider.socket) {
-            return this.emitter.emit(
-                this.socketProvider.socket,
-                eventName,
-                emitDataPack,
-                options,
-            );
-        } else {
-            throw Error("No provided socket!");
-        }
+        return this.emitter.emit(socket, eventName, emitDataPack, options);
     }
 
-    public on(eventName: string, callback: () => void) {
-        if (this.socketProvider.socket) {
-            this.receiver.on(this.socketProvider.socket, eventName, callback);
-        } else {
-            throw Error("No provided socket!");
-        }
+    public on(socket: ISocketEmitter, eventName: string, callback: () => void) {
+        this.receiver.on(socket, eventName, callback);
     }
 
-    public once(eventName: string, callback: () => void) {
-        if (this.socketProvider.socket) {
-            this.receiver.once(this.socketProvider.socket, eventName, callback);
-        } else {
-            throw Error("No provided socket!");
-        }
+    public once(
+        socket: ISocketEmitter,
+        eventName: string,
+        callback: () => void,
+    ) {
+        this.receiver.once(socket, eventName, callback);
     }
 }
