@@ -25,10 +25,10 @@ export class ReliableSocketRequestService {
     public emit(
         socket: ISocketEmitter,
         eventName: string,
-        emitDataPack: any,
+        body: any,
         options: Partial<IReliableSocketEmitOptions> = {},
     ): Promise<any> {
-        return this.emitter.emit(socket, eventName, emitDataPack, options);
+        return this.emitter.emit(socket, eventName, body, options);
     }
 
     public on(socket: ISocketEmitter, eventName: string, callback: () => void) {

@@ -8,7 +8,7 @@ import { ISocketEmitter } from '../interfaces/i-socket-emitter';
 export class ReliableSocketRequestEmitter {
     private defaultEmitOptions = {
         inQueueType: InQueueType.anytime,
-        maxTryCount: 0,
+        maxTryCount: 10,
         queueName: 'default',
         retryTime: 1000,
     };
@@ -20,7 +20,7 @@ export class ReliableSocketRequestEmitter {
     public emit(
         socket: ISocketEmitter,
         eventName: string,
-        emitDataPack: any,
+        body: any,
         optionsIn: Partial<IReliableSocketEmitOptions> = this
             .defaultEmitOptions,
     ): Promise<any> {
@@ -34,7 +34,9 @@ export class ReliableSocketRequestEmitter {
             eventName,
             id: this.emitRequestCounter++,
             isCompleted: false,
-            options
+            options,
+            tryCountLeft: options.maxTryCount,
+            body
         } as IReliableSocketRequest;
 
         if (this.emitQueues[options.queueName] === undefined) {
@@ -42,8 +44,6 @@ export class ReliableSocketRequestEmitter {
         }
 
         this.emitQueues[options.queueName].push(socketRequest);
-
-        emitDataPack.requestCounter = this.emitRequestCounter;
 
         return this.createEmitPromise(socket, socketRequest, options);
     }
@@ -62,16 +62,20 @@ export class ReliableSocketRequestEmitter {
         socketRequest: IReliableSocketRequest,
         options: IReliableSocketEmitOptions,
     ): Promise<any> {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             socketRequest.isCompleted = false;
 
             this.emitRequest(socket, socketRequest, response => {
                 resolve(response);
+            }, (err: string) => {
+                reject(err);
             });
 
             socketRequest.interval = setInterval(() => {
                 this.emitRequest(socket, socketRequest, response => {
                     resolve(response);
+                }, (err: string) => {
+                    reject(err);
                 });
             }, options.retryTime);
         });
@@ -84,18 +88,27 @@ export class ReliableSocketRequestEmitter {
         socket: ISocketEmitter,
         socketRequest: IReliableSocketRequest,
         callback: (response: any) => void,
+        reject: (msg: string) => void,
     ): void {
-        if (socketRequest.isCompleted) {
+        // socketRequest.options.maxTryCount === 0 means infinite retries
+        if (socketRequest.tryCountLeft <= 0 && socketRequest.options.maxTryCount !== 0) {
+            reject('Max try count reached!');
+            return;
+        }
+
+        // Request already completed
+        if (socketRequest.isCompleted || (socketRequest.tryCountLeft <= 0 && socketRequest.options.maxTryCount !== 0)) {
             if (socketRequest.interval) {
                 clearInterval(socketRequest.interval);
             }
             return;
         }
 
+
         if (socket) {
             socket.emit(
                 socketRequest.eventName,
-                this.createEmitPack(socketRequest, socketRequest.options),
+                this.createEmitPack(socketRequest),
                 (response: any) => {
                     socketRequest.isCompleted = true;
                     this.removeFromEmitQueue(socketRequest);
@@ -116,15 +129,14 @@ export class ReliableSocketRequestEmitter {
      * Create transfer package with meta information
      */
     private createEmitPack(
-        data: any,
-        options: IReliableSocketEmitOptions,
+        request: IReliableSocketRequest
     ): IReliableSocketRequestPack {
         return {
-            body: data,
+            body: request.body,
             meta: {
                 id: this.emitRequestCounter,
-                inQueueType: options.inQueueType,
-                queueName: options.queueName,
+                inQueueType: request.options.inQueueType,
+                queueName: request.options.queueName,
             },
         };
     }

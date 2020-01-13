@@ -6,4 +6,9 @@ export interface IReliableSocketRequest {
     options: IReliableSocketEmitOptions;
     interval?: any;
     isCompleted: boolean;
+    tryCountLeft: number;
+    /**
+     * Data for transfer
+     */
+    body: any;
 }
