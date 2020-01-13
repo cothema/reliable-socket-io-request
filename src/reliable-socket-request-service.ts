@@ -22,7 +22,7 @@ export class ReliableSocketRequestService {
     public emit(
         eventName: string,
         emitDataPack: any,
-        options: IReliableSocketEmitOptions,
+        options: Partial<IReliableSocketEmitOptions> = {},
     ): Promise<any> {
         return this.emitter.emit(eventName, emitDataPack, options);
     }

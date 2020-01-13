@@ -1,4 +1,4 @@
-import { ReliableSocketRequestInQueueType } from "../enums/reliable-socket-request-in-queue-type";
+import { InQueueType } from "../enums/in-queue-type";
 
 export interface IReliableSocketEmitOptions {
     /**
@@ -22,5 +22,5 @@ export interface IReliableSocketEmitOptions {
     /**
      * inQueueType defines how the request should be handled in a queue.
      */
-    inQueueType: ReliableSocketRequestInQueueType;
+    inQueueType: InQueueType;
 }

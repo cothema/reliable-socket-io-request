@@ -1,15 +1,15 @@
-import { ReliableSocketRequestInQueueType } from '../enums/reliable-socket-request-in-queue-type';
-import { IReliableSocketEmitOptions } from '../interfaces/i-reliable-socket-emit-options';
-import { IReliableSocketRequest } from '../interfaces/i-reliable-socket-request';
-import { IReliableSocketRequestPack } from '../interfaces/i-reliable-socket-request-pack';
-import { IReliableSocketRequestQueues } from '../interfaces/i-reliable-socket-request-queues';
-import { ISocketEmitter } from '../interfaces/i-socket-emitter';
+import { InQueueType } from "../enums/in-queue-type";
+import { IReliableSocketEmitOptions } from "../interfaces/i-reliable-socket-emit-options";
+import { IReliableSocketRequest } from "../interfaces/i-reliable-socket-request";
+import { IReliableSocketRequestPack } from "../interfaces/i-reliable-socket-request-pack";
+import { IReliableSocketRequestQueues } from "../interfaces/i-reliable-socket-request-queues";
+import { ISocketEmitter } from "../interfaces/i-socket-emitter";
 
 export class ReliableSocketRequestEmitter {
     private defaultEmitOptions = {
-        inQueueType: ReliableSocketRequestInQueueType.anytime,
+        inQueueType: InQueueType.anytime,
         maxTryCount: 0,
-        queueName: 'default',
+        queueName: "default",
         retryTime: 1000,
     };
     private emitQueues: IReliableSocketRequestQueues = {
@@ -17,15 +17,19 @@ export class ReliableSocketRequestEmitter {
     };
     private emitRequestCounter = 0;
 
-    public constructor(private socket: ISocketEmitter) {
-    }
+    public constructor(private socket: ISocketEmitter) {}
 
     public emit(
         eventName: string,
         emitDataPack: any,
-        options: IReliableSocketEmitOptions = this.defaultEmitOptions,
+        optionsIn: Partial<IReliableSocketEmitOptions> = this
+            .defaultEmitOptions,
     ): Promise<any> {
-        options = Object.assign({}, this.defaultEmitOptions, options);
+        const options: IReliableSocketEmitOptions = Object.assign(
+            {},
+            this.defaultEmitOptions,
+            optionsIn,
+        );
 
         const socketRequest = {
             eventName,
