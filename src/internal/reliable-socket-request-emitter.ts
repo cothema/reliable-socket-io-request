@@ -1,15 +1,15 @@
-import { InQueueType } from "../enums/in-queue-type";
-import { IReliableSocketEmitOptions } from "../interfaces/i-reliable-socket-emit-options";
-import { IReliableSocketRequest } from "../interfaces/i-reliable-socket-request";
-import { IReliableSocketRequestPack } from "../interfaces/i-reliable-socket-request-pack";
-import { IReliableSocketRequestQueues } from "../interfaces/i-reliable-socket-request-queues";
-import { ISocketEmitter } from "../interfaces/i-socket-emitter";
+import { InQueueType } from '../enums/in-queue-type';
+import { IReliableSocketEmitOptions } from '../interfaces/i-reliable-socket-emit-options';
+import { IReliableSocketRequest } from '../interfaces/i-reliable-socket-request';
+import { IReliableSocketRequestPack } from '../interfaces/i-reliable-socket-request-pack';
+import { IReliableSocketRequestQueues } from '../interfaces/i-reliable-socket-request-queues';
+import { ISocketEmitter } from '../interfaces/i-socket-emitter';
 
 export class ReliableSocketRequestEmitter {
     private defaultEmitOptions = {
         inQueueType: InQueueType.anytime,
         maxTryCount: 0,
-        queueName: "default",
+        queueName: 'default',
         retryTime: 1000,
     };
     private emitQueues: IReliableSocketRequestQueues = {
@@ -34,9 +34,12 @@ export class ReliableSocketRequestEmitter {
             eventName,
             id: this.emitRequestCounter++,
             isCompleted: false,
-            options,
-            socket,
+            options
         } as IReliableSocketRequest;
+
+        if (this.emitQueues[options.queueName] === undefined) {
+            this.emitQueues[options.queueName] = [];
+        }
 
         this.emitQueues[options.queueName].push(socketRequest);
 
@@ -105,7 +108,7 @@ export class ReliableSocketRequestEmitter {
                 },
             );
         } else {
-            throw Error("No provided socket!");
+            throw Error('No provided socket!');
         }
     }
 
