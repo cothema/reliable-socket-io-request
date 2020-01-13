@@ -1,6 +1,6 @@
 {
     "name": "reliable-socket-io-request",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Reliable Socket IO handler with multiple queues support and clearance scenarios.",
     "author": "Miloš Havlíček",
     "license": "MIT",
