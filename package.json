@@ -1,0 +1,71 @@
+{
+    "name": "reliable-socket-io-request",
+    "version": "0.1.0",
+    "description": "Reliable Socket IO handler with multiple queues support and clearance scenarios.",
+    "author": "Miloš Havlíček",
+    "license": "MIT",
+    "repository": "https://github.com/cothema/reliable-socket-io-request",
+    "scripts": {
+        "build": "mkdir -p pkg && pika build --verbose && ng build",
+        "lint": "tslint -p . --fix",
+        "pub": "pika publish",
+        "version": "npm run build"
+    },
+    "keywords": [
+        "socket.io",
+        "reliable",
+        "socket",
+        "handler"
+    ],
+    "@pika/pack": {
+        "pipeline": []
+    },
+    "prepublish": "npm run lint && npm run build",
+    "peerDependencies": {
+        "rxjs": "^6.5.4"
+    },
+    "optionalDependencies": {},
+    "devDependencies": {
+        "@angular-devkit/build-ng-packagr": "^0.803.22",
+        "@angular/cli": "^8.3.22",
+        "@angular/common": "^8.2.14",
+        "@angular/compiler": "^8.2.14",
+        "@angular/compiler-cli": "^8.2.14",
+        "@angular/core": "^8.2.14",
+        "@babel/plugin-proposal-class-properties": "^7.8.0",
+        "@babel/plugin-proposal-decorators": "^7.8.0",
+        "@pika/cli": "^0.2.0",
+        "@pika/pack": "^0.5.0",
+        "@pika/plugin-build-node": "^0.8.1",
+        "@pika/plugin-build-types": "^0.8.1",
+        "@pika/plugin-ts-standard-pkg": "^0.8.1",
+        "@types/jasmine": "^3.5.0",
+        "@types/node": "^13.1.6",
+        "husky": "^4.0.7",
+        "install-peers": "^1.0.3",
+        "lint-staged": "^9.5.0",
+        "ng-packagr": "^5.7.1",
+        "prettier": "^1.19.1",
+        "rxjs": "^6.5.4",
+        "tslint": "^5.20.1",
+        "tslint-config-prettier": "^1.18.0",
+        "tslint-etc": "^1.10.0",
+        "tslint-plugin-prettier": "^2.1.0",
+        "typescript": "~3.5.3",
+        "zone.js": "^0.9.1"
+    },
+    "prettier": {
+        "trailingComma": "all"
+    },
+    "lint-staged": {
+        "src/**/*.{ts,tsx}": [
+            "tslint -p . --fix",
+            "git add"
+        ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npx lint-staged"
+        }
+    }
+}
