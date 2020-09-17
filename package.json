@@ -46,7 +46,7 @@
         "install-peers": "^1.0.3",
         "lint-staged": "^10.0.1",
         "ng-packagr": "^5.7.1",
-        "prettier": "^1.19.1",
+        "prettier": "^2.1.2",
         "rxjs": "^6.5.4",
         "rxjs-compat": "^6.5.4",
         "tslint": "^5.20.1",
